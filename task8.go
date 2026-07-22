@@ -11,7 +11,7 @@ func rplc(exp int, j int, b string) int {
 		dv = fmt.Sprint(i%2) + dv
 		i = int(i / 2)
 	}
-	dv = dv[:j] + b + dv[j+1:]
+	dv = dv[:j-1] + b + dv[j:]
 	var ch int
 	for i, v := range dv {
 		ch += int(v-'0') * int(math.Pow(2, float64(len(dv)-1-i)))
@@ -19,5 +19,5 @@ func rplc(exp int, j int, b string) int {
 	return ch
 }
 func main() {
-	fmt.Println(rplc(42, 2, "0"))
+	fmt.Println(rplc(5, 1, "0"))
 }
