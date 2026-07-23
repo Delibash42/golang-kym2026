@@ -47,11 +47,6 @@ func main() {
 	fmt.Println("\nПолучен сигнал")
 
 	cancel()
-
-	done := make(chan struct{})
-	go func() {
-		wg.Wait()
-		close(done)
-	}()
+	wg.Wait()
 
 }

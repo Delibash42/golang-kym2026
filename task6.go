@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"runtime"
 	"sync"
+	"time"
 )
 
 func main() {
@@ -17,7 +18,7 @@ func main() {
 	}()
 
 	wg.Add(1)
-	die1 := make(chan bool)
+	die1 := make(chan bool, 1)
 	go func() {
 		defer wg.Done()
 		i := 0
@@ -59,7 +60,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		defer fmt.Println("defer")
+		defer fmt.Println("goexit")
 		for i := 0; i < 3; i++ {
 			if i == 1 {
 				runtime.Goexit()
@@ -75,6 +76,7 @@ func main() {
 			fmt.Println(i)
 		}
 		fmt.Println("return")
+		return
 	}()
 
 	wg.Add(1)
@@ -85,7 +87,7 @@ func main() {
 		}()
 		for i := 0; i < 2; i++ {
 			if i == 1 {
-				panic("стоп")
+				panic("паника")
 			}
 			fmt.Println(i)
 		}
@@ -99,7 +101,7 @@ func main() {
 		for {
 			select {
 			case <-die2:
-				fmt.Println("завершена")
+				fmt.Println("завершена через закрытие канала")
 				return
 			default:
 				fmt.Println(i)
@@ -111,20 +113,22 @@ func main() {
 		}
 	}()
 
+	ctx1, cancel1 := context.WithTimeout(context.Background(), 5*time.Second)
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		i := 0
 		for {
 			select {
-			case <-ctx.Done():
+			case <-ctx1.Done():
 				fmt.Println("таймаут")
 				return
 			default:
 				fmt.Println(i)
 				i++
 				if i >= 2 {
-					cancel()
+					cancel1()
 				}
 			}
 		}
